@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script>(function(){var t=localStorage.getItem('theme')||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t);})();</script>
+    <title>Job News — Placement System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .news-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 20px 22px;
+            margin-bottom: 14px;
+            transition: box-shadow 0.15s, border-color 0.15s;
+        }
+        .news-card:hover {
+            box-shadow: 0 4px 16px rgba(0,0,0,0.07);
+            border-color: #bfdbfe;
+        }
+        .news-card a {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1e40af;
+            text-decoration: none;
+            line-height: 1.5;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .news-card a:hover { text-decoration: underline; }
+        .news-meta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .news-source {
+            background: #dbeafe;
+            color: #1d4ed8;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 3px 10px;
+            border-radius: 99px;
+        }
+        .news-date {
+            font-size: 12px;
+            color: #94a3b8;
+        }
+        .filter-bar {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 18px 22px;
+            margin-bottom: 24px;
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+            flex-wrap: wrap;
+        }
+        .filter-bar .form-group { margin: 0; flex: 1; min-width: 200px; }
+        .skill-tags { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
+        .skill-tag {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            color: #1d4ed8;
+            font-size: 13px;
+            font-weight: 500;
+            padding: 4px 14px;
+            border-radius: 99px;
+        }
+        .read-more {
+            display: inline-block;
+            margin-top: 10px;
+            font-size: 13px;
+            color: #2563eb;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .read-more:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+<nav>
+    <a class="nav-brand" href="/"><span>Placement</span> System</a>
+    <div class="nav-links">
+        <a href="/">Home</a>
+        <a href="/news" class="active">Job News</a>
+        <a href="/history">History</a>
+        <a href="/admin">Admin</a>
+        <a href="/logout" class="nav-logout">Logout</a>
+        <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle dark mode" title="Toggle dark mode"><span class="icon-light">&#127769;</span><span class="icon-dark">&#9728;&#65039;</span></button>
+    </div>
+</nav>
+
+<div class="page">
+
+    <!-- Header -->
+    <div class="page-header">
+        <h1>Job News</h1>
+        <p>Live job market updates — filtered by your skills</p>
+    </div>
+
+    <!-- Skill Filter -->
+    <form action="/news" method="get" class="filter-bar">
+        <div class="form-group">
+            <label>Filter by Skills</label>
+            <input type="text" name="skills"
+                   value="{{ skill_filter }}"
+                   placeholder="e.g. Python SQL Flask">
+        </div>
+        <button type="submit" class="btn btn-primary">Search News</button>
+        {% if skill_filter %}
+        <a href="/news" class="btn btn-secondary">Clear</a>
+        {% endif %}
+    </form>
+
+    <!-- Active skill tags -->
+    {% if used_skills %}
+    <div class="skill-tags">
+        <span class="text-muted" style="align-self:center; font-size:13px;">Showing news for:</span>
+        {% for s in used_skills %}
+            <span class="skill-tag">{{ s }}</span>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Articles -->
+    {% if articles %}
+        {% for article in articles %}
+        <div class="news-card">
+            <a href="{{ article.link }}" target="_blank">{{ article.title }}</a>
+            <div class="news-meta">
+                <span class="news-source">{{ article.source }}</span>
+                {% if article.published %}
+                <span class="news-date">{{ article.published[:16] }}</span>
+                {% endif %}
+            </div>
+            <a href="{{ article.link }}" target="_blank" class="read-more">Read article →</a>
+        </div>
+        {% endfor %}
+    {% else %}
+    <div class="card">
+        <div class="empty-state">
+            <p>No articles found for these skills. Try different keywords.</p>
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+<script src="{{ url_for('static', filename='theme.js') }}" defer></script>
+</body>
+</html>

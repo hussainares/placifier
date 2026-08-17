@@ -1,0 +1,8 @@
+flask
+numpy
+psycopg2-binary
+scikit-learn
+requests
+werkzeug
+pdfminer.six
+python-dotenv
