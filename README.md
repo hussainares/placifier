@@ -1,104 +1,107 @@
-# Placement Recommendation System
+# 🎓 Placement Recommendation System
 
-Flask app that matches student skills to job roles (TF-IDF + cosine similarity),
-extracts skills/name from an uploaded resume PDF, and shows relevant job news.
-Deployed as a serverless function on Vercel, with Postgres on Supabase.
+A modern Flask application that intelligently matches student skills to job roles using **TF-IDF NLP ranking and Cosine Similarity**. The system seamlessly parses uploaded PDF resumes to extract core competencies, aggregates relevant industry career news, and features a persistent white-and-blue dark mode architecture.
 
-Theme: white/blue, with a light↔dark toggle (top-right of the nav) that
-persists per-browser via `localStorage`.
+---
 
-## Project structure
+## 🚀 Key Features
+
+* **AI-Powered Matching:** Calculates proximity vectors between parsed resume text and seed job matrices.
+* **Resume Parsing:** Automated client-side extraction of candidate names and skill matrices from PDF data.
+* **Dynamic News Feed:** Real-time job trends via external API synchronization.
+* **Optimized Architecture:** Stateless application logic tailored specifically for serverless lifecycles.
+* **Modern Interface:** High-contrast white/blue UI layout with system-syncing dark mode state hydration.
+
+---
+
+## 🛠️ Tech Stack & Architecture
+
+* **Backend Framework:** Flask (Python)
+* **Vector Vectorization:** Scikit-Learn (TF-IDF + Cosine Similarity)
+* **Database Layer:** PostgreSQL (Hosted via Supabase)
+* **Hosting Platform:** Vercel (Serverless Functions)
+
+### Directory Mapping
+```text
+├── api/
+│   └── index.py        # Vercel serverless gateway function
+├── static/
+│   ├── style.css       # Semantic CSS variables for light/dark layouts
+│   └── theme.js        # Hydration logic for system theme toggles
+├── templates/          # Jinja2 contextual HTML pages
+├── app.py              # Main Flask application routers
+├── config.py           # Strictly typed environment configuration
+├── db.py               # Optimized, pooled per-request DB clients
+└── vercel.json         # Infrastructure build and routing definitions
 ```
-api/index.py      # Vercel entrypoint -> imports app.py
-app.py            # Flask routes
-config.py         # env var loading
-db.py             # Postgres connection (per-request, pooled)
-schema.sql        # table definitions
-jobs.csv          # seed data for the `jobs` table
-static/style.css  # theme (light/dark via CSS variables)
-static/theme.js   # dark-mode toggle button behavior
-templates/*.html  # pages
-vercel.json       # Vercel build/routing config
-```
 
-## 1. Recreate the Supabase project
+---
 
-1. Go to https://supabase.com/dashboard → **New project**.
-2. Once it's provisioned, open **Project Settings → Database → Connection string**.
-   Copy the **Transaction pooler** string (port `6543`) — this is the one built
-   for serverless (short-lived, per-request connections), which is how `db.py`
-   is written. It looks like:
-   ```
-   postgresql://postgres.[project-ref]:[password]@aws-0-[region].pooler.supabase.com:6543/postgres
-   ```
-3. Open the **SQL Editor** and run the contents of `schema.sql` to create the
-   `users`, `jobs`, `students`, and `recommendations` tables.
-4. Seed the `jobs` table — either:
-   - run `seed_jobs.sql` (included, already generated from `jobs.csv`) in the SQL Editor, or
-   - **Table Editor → jobs → Insert → Import data from CSV** and upload `jobs.csv` directly.
+## ⚡ Quick Start
 
-## 2. Configure environment variables
+### 1. Database Provisioning (Supabase)
+1. Initialize a new project on the **[Supabase Dashboard](https://supabase.com/dashboard)**.
+2. Navigate to **Project Settings → Database → Connection string** and select **Transaction Pooler** (Port `6543`).
+3. Execute the `schema.sql` declarations inside the **SQL Editor** to construct core application entities.
+4. Populate core data by executing `seed_jobs.sql` or importing `jobs.csv` within the **Table Editor**.
 
+### 2. Environment Management
+Clone the configuration boilerplate and define required structural strings:
 ```bash
 cp .env.example .env
 ```
-Fill in:
-- `DATABASE_URL` — the pooler string from step 1
-- `SECRET_KEY` — generate with `python -c "import secrets; print(secrets.token_hex(32))"`
-- `NEWS_API_KEY` — optional, from https://newsapi.org (news feed is skipped if blank)
+Ensure your configuration file contains these variables:
+* `DATABASE_URL` — Your Supabase Transaction Pooler connection string.
+* `SECRET_KEY` — Cryptographic string (Generate using `python -c "import secrets; print(secrets.token_hex(32))"`).
+* `NEWS_API_KEY` — *(Optional)* Live query credentials generated from `https://newsapi.org`.
 
-`.env` is already in `.gitignore` — it will never be committed.
-
-## 3. Run locally
-
+### 3. Local Development Core
 ```bash
-python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
+# Instantiate and toggle virtual runtime environments
+python -m venv .venv
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
+
+# Populate dependencies and boot development servers
 pip install -r requirements.txt
 flask --app app run --debug
 ```
-Visit http://127.0.0.1:5000 — sign up for an account, then log in.
+Access the exposed application loop directly at `http://127.0.0.1:5000`.
 
-## 4. Push to GitHub
+---
 
+## 📦 Deployment Strategies
+
+### Repository Initialization
 ```bash
 git init
 git add .
-git commit -m "Placement system: white/blue theme, dark mode, Vercel + Supabase"
+git commit -m "feat: infrastructure tracking, pooled storage context, structural modes"
 git branch -M main
 git remote add origin https://github.com/<your-username>/<your-repo>.git
 git push -u origin main
 ```
-(If the repo doesn't exist yet, create an empty one on GitHub first — no README/license,
-so it doesn't conflict with this push.)
 
-## 5. Deploy to Vercel
+### Vercel Serverless Orchestration
 
-**Dashboard (recommended for first deploy):**
-1. https://vercel.com/new → **Import** your GitHub repo.
-2. Framework preset: **Other** (vercel.json already defines the build).
-3. Add environment variables in **Settings → Environment Variables**:
-   `DATABASE_URL`, `SECRET_KEY`, `NEWS_API_KEY` — same values as your `.env`.
-4. Deploy.
+#### Option A: Git Dashboard (Recommended)
+1. Connect repositories directly inside the **[Vercel New Project Wizard](https://vercel.com/new)**.
+2. Keep the Framework Preset configured to **Other** (The workspace `vercel.json` maps execution scopes dynamically).
+3. Inject production credentials inside **Settings → Environment Variables** (`DATABASE_URL`, `SECRET_KEY`, `NEWS_API_KEY`).
+4. Trigger compilation pipelines.
 
-**Or via CLI:**
+#### Option B: Terminal Client Lifecycle
 ```bash
 npm i -g vercel
 vercel login
-vercel            # first deploy / preview
 vercel env add DATABASE_URL
 vercel env add SECRET_KEY
 vercel env add NEWS_API_KEY
-vercel --prod     # production deploy
+vercel --prod
 ```
 
-Every subsequent `git push` to `main` auto-deploys if the repo is connected
-in the Vercel dashboard.
+---
 
-## Notes on the dark mode implementation
-- All theme colors are CSS variables in `static/style.css`, redefined under
-  `html[data-theme="dark"]`.
-- A small inline script in each page's `<head>` sets `data-theme` **before**
-  first paint (reading `localStorage`, falling back to the OS preference) so
-  there's no flash of the wrong theme.
-- `static/theme.js` just wires up the moon/sun button to flip `data-theme`
-  and persist the choice.
+## 🎨 Creative Theme Mechanics
+
+* **Layout State Management:** Custom theme bindings parse system-level parameters via runtime attribute tracking (`html[data-theme="dark"]`).
+* **Visual Flash Prevention:** Synchronous blocker headers look up native client values inside document headers (`localStorage`) **prior** to client layout paints to isolate visual clipping or styling pops.
