@@ -1,54 +1,30 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <script>(function(){var t=localStorage.getItem('theme')||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t);})();</script>
-    <title>Result — Placement System</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
+{% extends "base.html" %}
+{% block title %}Results — Placifier{% endblock %}
 
-<nav>
-    <a class="nav-brand" href="/"><span>Placement</span> System</a>
-    <div class="nav-links">
-        <a href="/">Home</a>
-        <a href="/news">Job News</a>
-        <a href="/history">History</a>
-        <a href="/logout" class="nav-logout">Logout</a>
-        <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle dark mode" title="Toggle dark mode"><span class="icon-light">&#127769;</span><span class="icon-dark">&#9728;&#65039;</span></button>
-    </div>
-</nav>
-
+{% block content %}
 <div class="page">
     <div class="page-header">
         <h1>Results for {{ name }}</h1>
         <p>Top 3 job matches based on your skill profile</p>
     </div>
 
-    <!-- Top 3 Matches -->
     <div class="card">
         <h2>🎯 Job Matches</h2>
         <div class="table-wrap">
             <table>
                 <thead>
-                    <tr>
-                        <th>Rank</th>
-                        <th>Recommended Job</th>
-                        <th>Match Score</th>
-                    </tr>
+                    <tr><th>Rank</th><th>Recommended Job</th><th>Field</th><th>Match Score</th></tr>
                 </thead>
                 <tbody>
                     {% for r in results %}
                     <tr>
                         <td>
-                            {% if loop.index == 1 %}
-                                <span class="rank-1">🥇 1st</span>
-                            {% elif loop.index == 2 %}
-                                <span class="rank-2">🥈 2nd</span>
-                            {% else %}
-                                <span class="rank-3">🥉 3rd</span>
-                            {% endif %}
+                            {% if loop.index == 1 %}<span class="rank-1">🥇 1st</span>
+                            {% elif loop.index == 2 %}<span class="rank-2">🥈 2nd</span>
+                            {% else %}<span class="rank-3">🥉 3rd</span>{% endif %}
                         </td>
                         <td><strong>{{ r.job }}</strong></td>
+                        <td><span class="badge badge-blue">{{ r.department }}</span></td>
                         <td style="min-width:160px;">
                             {{ r.score }}%
                             <progress value="{{ r.score }}" max="100"></progress>
@@ -60,16 +36,13 @@
         </div>
     </div>
 
-    <!-- Skill Gap Analysis -->
     <div class="card">
         <h2>🧭 Skill Analysis — Top Match</h2>
 
-        <p style="font-size:13px; font-weight:600; color:#475569; margin-bottom:8px;">
-            SKILLS YOU HAVE
-        </p>
+        <p class="label-caps">SKILLS YOU HAVE</p>
         <div class="gap-2">
             {% for s in matched %}
-                <span class="badge badge-green">✓ {{ s }}</span>
+                <span class="badge badge-green">✓ {{ s|replace('_', ' ') }}</span>
             {% else %}
                 <span class="text-muted">No matching skills found</span>
             {% endfor %}
@@ -77,50 +50,43 @@
 
         <hr class="divider">
 
-        <p style="font-size:13px; font-weight:600; color:#475569; margin-bottom:8px;">
-            SKILLS TO LEARN
-        </p>
+        <p class="label-caps">SKILLS TO LEARN</p>
         <div class="gap-2">
             {% for s in missing %}
-                <span class="badge badge-red">✗ {{ s }}</span>
+                <span class="badge badge-red">✗ {{ s|replace('_', ' ') }}</span>
             {% else %}
                 <span class="badge badge-green">🎉 Perfect match — no missing skills!</span>
             {% endfor %}
         </div>
     </div>
 
-    <!-- Skill-Specific Job News -->
     <div class="card">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; padding-bottom:12px; border-bottom:1px solid #f1f5f9;">
-            <h2 style="border:none; padding:0; margin:0;">📰 Job News For Your Skills</h2>
-            <a href="/news?skills={{ matched|join('+') }}" class="btn btn-secondary btn-sm">View All</a>
+        <div class="flex-between" style="margin-bottom:12px; padding-bottom:12px; border-bottom:1px solid var(--border);">
+            <h2 class="plain">📰 Job News For Your Skills</h2>
+            <a href="/news?skills={{ matched|join('+') }}" class="btn btn-secondary btn-sm">View all</a>
         </div>
 
         {% if used_skills %}
         <div class="gap-2" style="margin-bottom:14px;">
             <span class="text-muted">Filtered by:</span>
             {% for s in used_skills %}
-                <span class="badge badge-blue">{{ s }}</span>
+                <span class="badge badge-blue">{{ s|replace('_', ' ') }}</span>
             {% endfor %}
         </div>
         {% endif %}
 
         {% for article in articles %}
         <div class="article">
-            <a href="{{ article.link }}" target="_blank">{{ article.title }}</a>
+            <a href="{{ article.link }}" target="_blank" rel="noopener noreferrer">{{ article.title }}</a>
             <div class="source">
-                {{ article.source }}
-                {% if article.published %}
-                &nbsp;·&nbsp; {{ article.published[:16] }}
-                {% endif %}
+                {{ article.source }}{% if article.published %} &nbsp;·&nbsp; {{ article.published[:16] }}{% endif %}
             </div>
         </div>
+        {% else %}
+        <p class="text-muted">No news available right now.</p>
         {% endfor %}
     </div>
 
-    <a href="/" class="btn btn-secondary">← Back to Home</a>
+    <a href="/" class="btn btn-secondary">← Back to home</a>
 </div>
-
-<script src="{{ url_for('static', filename='theme.js') }}" defer></script>
-</body>
-</html>
+{% endblock %}

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Placifier{% endblock %}</title>
+    <script>
+        (function () {
+            var t;
+            try { t = localStorage.getItem('theme'); } catch (e) {}
+            if (!t) t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', t);
+        })();
+    </script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    {% block head %}{% endblock %}
+</head>
+<body>
+
+<nav>
+    <a class="nav-brand" href="/"><span>Placi</span>fier</a>
+    <div class="nav-links">
+        {% if session.get('email') %}
+            <a href="/" class="{{ 'active' if active == 'home' }}">Home</a>
+            <a href="/news" class="{{ 'active' if active == 'news' }}">Job News</a>
+            <a href="/history" class="{{ 'active' if active == 'history' }}">History</a>
+            {% if is_admin %}
+            <a href="/admin" class="{{ 'active' if active == 'admin' }}">Admin</a>
+            {% endif %}
+            <a href="/logout" class="nav-logout">Logout</a>
+        {% endif %}
+        <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle dark mode" title="Toggle dark mode"><span class="icon-light">&#127769;</span><span class="icon-dark">&#9728;&#65039;</span></button>
+    </div>
+</nav>
+
+{% block content %}{% endblock %}
+
+<script src="{{ url_for('static', filename='theme.js') }}" defer></script>
+</body>
+</html>

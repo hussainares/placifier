@@ -1,35 +1,20 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <script>(function(){var t=localStorage.getItem('theme')||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t);})();</script>
-    <title>History — Placement System</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
+{% extends "base.html" %}
+{% set active = 'history' %}
+{% block title %}History — Placifier{% endblock %}
 
-<nav>
-    <a class="nav-brand" href="/"><span>Placement</span> System</a>
-    <div class="nav-links">
-        <a href="/">Home</a>
-        <a href="/news">Job News</a>
-        <a href="/history" class="active">History</a>
-        <a href="/admin">Admin</a>
-        <a href="/logout" class="nav-logout">Logout</a>
-        <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle dark mode" title="Toggle dark mode"><span class="icon-light">&#127769;</span><span class="icon-dark">&#9728;&#65039;</span></button>
-    </div>
-</nav>
-
+{% block content %}
 <div class="page">
-    <div class="flex-between">
+    <div class="flex-between" style="margin-bottom:24px;">
         <div class="page-header" style="margin-bottom:0">
-            <h1>Recommendation History</h1>
-            <p>All past job recommendations</p>
+            <h1>Your History</h1>
+            <p>Your past job recommendations</p>
         </div>
-        <a href="/clear_history"
-           class="btn btn-danger btn-sm"
-           onclick="return confirm('Delete all history? This cannot be undone.')">
-            Clear History
-        </a>
+        {% if records %}
+        <form action="/clear_history" method="post" class="inline-form"
+              onsubmit="return confirm('Delete your history? This cannot be undone.')">
+            <button type="submit" class="btn btn-danger btn-sm">Clear history</button>
+        </form>
+        {% endif %}
     </div>
 
     <div class="card">
@@ -37,23 +22,15 @@
         <div class="table-wrap">
             <table>
                 <thead>
-                    <tr>
-                        <th>Student</th>
-                        <th>Recommended Job</th>
-                        <th>Match Score</th>
-                        <th>Date</th>
-                    </tr>
+                    <tr><th>Name</th><th>Recommended Job</th><th>Match Score</th><th>Date</th></tr>
                 </thead>
                 <tbody>
                     {% for r in records %}
                     <tr>
                         <td><strong>{{ r[0] }}</strong></td>
                         <td>{{ r[1] }}</td>
-                        <td>
-                            {{ r[2] }}%
-                            <progress value="{{ r[2] }}" max="100"></progress>
-                        </td>
-                        <td class="text-muted">{{ r[3] }}</td>
+                        <td>{{ r[2] }}% <progress value="{{ r[2] }}" max="100"></progress></td>
+                        <td class="text-muted">{{ r[3].strftime('%d %b %Y, %H:%M') if r[3] else '' }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -61,12 +38,9 @@
         </div>
         {% else %}
         <div class="empty-state">
-            <p>No recommendations yet.</p>
+            <p>No recommendations yet. <a href="/">Get your first one</a>.</p>
         </div>
         {% endif %}
     </div>
 </div>
-
-<script src="{{ url_for('static', filename='theme.js') }}" defer></script>
-</body>
-</html>
+{% endblock %}

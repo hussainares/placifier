@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} — Placifier{% endblock %}
+
+{% block content %}
+<div class="page-sm" style="text-align:center;">
+    <div class="card">
+        <p class="text-muted" style="font-size:13px; font-weight:700; letter-spacing:0.06em; margin:0 0 6px;">ERROR {{ code }}</p>
+        <h1 style="font-size:22px; margin:0 0 8px;">{{ title }}</h1>
+        <p class="text-muted" style="margin:0 0 20px;">{{ message }}</p>
+        <a href="/" class="btn btn-primary">Back to home</a>
+    </div>
+</div>
+{% endblock %}

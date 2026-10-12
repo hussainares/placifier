@@ -1,23 +1,11 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <script>(function(){var t=localStorage.getItem('theme')||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t);})();</script>
-    <title>Sign Up — Placement System</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
+{% extends "base.html" %}
+{% block title %}Sign up — Placifier{% endblock %}
 
-<nav>
-    <a class="nav-brand" href="/"><span>Placement</span> System</a>
-    <div class="nav-links">
-        <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle dark mode" title="Toggle dark mode"><span class="icon-light">&#127769;</span><span class="icon-dark">&#9728;&#65039;</span></button>
-    </div>
-</nav>
-
+{% block content %}
 <div class="page-sm">
     <div class="auth-header">
-        <h1>Create account</h1>
-        <p>Register to use the placement recommendation system</p>
+        <h1>Create your account</h1>
+        <p>Get matched with jobs that fit your skills</p>
     </div>
 
     <div class="card">
@@ -27,22 +15,26 @@
 
         <form action="/signup" method="post">
             <div class="form-group">
-                <label>Username</label>
-                <input type="text" name="username" placeholder="Choose a username">
+                <label for="name">Full name</label>
+                <input id="name" type="text" name="name" value="{{ name or '' }}"
+                       placeholder="e.g. Hemayoun Hussain" autocomplete="name" required>
             </div>
             <div class="form-group">
-                <label>Password</label>
-                <input type="password" name="password" placeholder="Choose a password">
+                <label for="email">Email</label>
+                <input id="email" type="email" name="email" value="{{ email or '' }}"
+                       placeholder="you@example.com" autocomplete="email" required>
             </div>
-            <button type="submit" class="btn btn-primary" style="width:100%">Sign Up</button>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input id="password" type="password" name="password"
+                       placeholder="At least 8 characters" autocomplete="new-password" minlength="8" required>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Sign up</button>
         </form>
     </div>
 
     <div class="auth-footer">
-        Already have an account? <a href="/login">Login</a>
+        Already have an account? <a href="/login">Log in</a>
     </div>
 </div>
-
-<script src="{{ url_for('static', filename='theme.js') }}" defer></script>
-</body>
-</html>
+{% endblock %}

@@ -1,74 +1,55 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <script>(function(){var t=localStorage.getItem('theme')||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t);})();</script>
-    <title>Placement System</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
+{% extends "base.html" %}
+{% set active = 'home' %}
+{% block title %}Home — Placifier{% endblock %}
 
-<nav>
-    <a class="nav-brand" href="/"><span>Placement</span> System</a>
-    <div class="nav-links">
-        <a href="/" class="active">Home</a>
-        <a href="/news">Job News</a>
-        <a href="/history">History</a>
-        <a href="/admin">Admin</a>
-        <a href="/logout" class="nav-logout">Logout</a>
-        <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle dark mode" title="Toggle dark mode"><span class="icon-light">&#127769;</span><span class="icon-dark">&#9728;&#65039;</span></button>
-    </div>
-</nav>
-
+{% block content %}
 <div class="page">
     <div class="page-header">
-        <h1>Placement Recommendation System</h1>
-        <p>Welcome, {{ username }} — upload your resume or enter your skills to get matched</p>
+        <h1>Welcome to Placifier, {{ display_name }}</h1>
+        <p>Upload your resume or enter your skills to find the roles that fit you best</p>
     </div>
 
-    <!-- Resume Upload -->
     <div class="card">
         <h2>📄 Upload Resume (PDF)</h2>
         <p class="text-muted" style="margin-bottom:14px;">
-            Upload your resume and we will automatically extract your name and skills.
+            Upload your resume and we'll extract your name and skills automatically.
+            The file is read in memory and never stored.
         </p>
         <form action="/upload_resume" method="post" enctype="multipart/form-data">
             <div class="form-group">
-                <label>Choose PDF File</label>
-                <input type="file" name="resume" accept=".pdf">
+                <label for="resume">Choose PDF file</label>
+                <input id="resume" type="file" name="resume" accept=".pdf,application/pdf" required>
             </div>
-            <button type="submit" class="btn btn-secondary">Extract Details from Resume</button>
+            <button type="submit" class="btn btn-secondary">Extract details from resume</button>
         </form>
     </div>
 
-    <!-- Manual Entry -->
     <div class="card">
         <h2>🎯 Get Job Recommendation</h2>
         {% if error %}
         <div class="alert alert-error">{{ error }}</div>
         {% endif %}
-        {% if extracted_name %}
+        {% if extracted_name or extracted_skills %}
         <p class="text-muted" style="margin-bottom:10px; font-size:13px;">
-            Detected from resume — please check it's correct before submitting.
+            Detected from your resume — please check it's correct before submitting.
         </p>
         {% endif %}
         <form action="/recommend" method="post">
             <div class="form-group">
-                <label>Your Name</label>
-                <input type="text" name="name"
-                       value="{{ extracted_name if extracted_name else '' }}"
+                <label for="name">Your name</label>
+                <input id="name" type="text" name="name"
+                       value="{{ extracted_name or display_name }}"
                        placeholder="e.g. Hemayoun Hussain" required>
             </div>
             <div class="form-group">
-                <label>Your Skills</label>
-                <input type="text" name="skills"
-                       value="{{ extracted_skills if extracted_skills else '' }}"
-                       placeholder="e.g. Python SQL Flask MySQL" required>
+                <label for="skills">Your skills</label>
+                <input id="skills" type="text" name="skills"
+                       value="{{ extracted_skills or '' }}"
+                       placeholder="e.g. Python, Excel, Financial Modeling, Patient Care" required>
+                <div class="form-hint">Separate skills with commas. Any field works — tech, business, healthcare, engineering, design and more.</div>
             </div>
-            <button type="submit" class="btn btn-primary">Get Recommendation</button>
+            <button type="submit" class="btn btn-primary">Get recommendation</button>
         </form>
     </div>
-
 </div>
-<script src="{{ url_for('static', filename='theme.js') }}" defer></script>
-</body>
-</html>
+{% endblock %}

@@ -1,36 +1,19 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <script>(function(){var t=localStorage.getItem('theme')||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t);})();</script>
-    <title>Admin Dashboard — Placement System</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
+{% extends "base.html" %}
+{% set active = 'admin' %}
+{% block title %}Admin — Placifier{% endblock %}
 
-<nav>
-    <a class="nav-brand" href="/"><span>Placement</span> System</a>
-    <div class="nav-links">
-        <a href="/">Home</a>
-        <a href="/news">Job News</a>
-        <a href="/history">History</a>
-        <a href="/admin" class="active">Admin</a>
-        <a href="/logout" class="nav-logout">Logout</a>
-        <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle dark mode" title="Toggle dark mode"><span class="icon-light">&#127769;</span><span class="icon-dark">&#9728;&#65039;</span></button>
-    </div>
-</nav>
-
+{% block content %}
 <div class="page">
     <div class="page-header">
         <h1>Admin Dashboard</h1>
-        <p>Overview of all placement activity</p>
+        <p>Overview of all activity on Placifier</p>
     </div>
 
-   
     <div class="stats-grid">
         <div class="stat-card">
             <div style="font-size:20px;">🎓</div>
             <span class="stat-num">{{ total_students }}</span>
-            <div class="stat-label">Total Students</div>
+            <div class="stat-label">Registered Users</div>
         </div>
         <div class="stat-card">
             <div style="font-size:20px;">🧩</div>
@@ -44,15 +27,14 @@
         </div>
         <div class="stat-card">
             <div style="font-size:20px;">🏆</div>
-            <span class="stat-num" style="font-size:16px; padding-top:4px;">{{ top_job }}</span>
+            <span class="stat-num sm">{{ top_job }}</span>
             <div class="stat-label">Most Recommended Job</div>
         </div>
     </div>
 
-  
     <div class="card">
         <div class="flex-between">
-            <h2 style="border:none; padding:0; margin:0;">📊 All Recommendations</h2>
+            <h2 class="plain">📊 All Recommendations</h2>
             <a href="/export_csv" class="btn btn-success btn-sm">Export CSV</a>
         </div>
 
@@ -61,37 +43,25 @@
         <div class="table-wrap">
             <table>
                 <thead>
-                    <tr>
-                        <th>Student</th>
-                        <th>Recommended Job</th>
-                        <th>Match Score</th>
-                        <th>Date</th>
-                    </tr>
+                    <tr><th>Name</th><th>Account</th><th>Recommended Job</th><th>Match Score</th><th>Date</th></tr>
                 </thead>
                 <tbody>
                     {% for r in records %}
                     <tr>
                         <td><strong>{{ r[0] }}</strong></td>
+                        <td class="text-muted">{{ r[4] or '—' }}</td>
                         <td>{{ r[1] }}</td>
-                        <td>
-                            {{ r[2] }}%
-                            <progress value="{{ r[2] }}" max="100"></progress>
-                        </td>
-                        <td class="text-muted">{{ r[3] }}</td>
+                        <td>{{ r[2] }}% <progress value="{{ r[2] }}" max="100"></progress></td>
+                        <td class="text-muted">{{ r[3].strftime('%d %b %Y, %H:%M') if r[3] else '' }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
         {% else %}
-        <div class="empty-state">
-            <p>No recommendations yet.</p>
-        </div>
+        <div class="empty-state"><p>No recommendations yet.</p></div>
         {% endif %}
         </div>
     </div>
 </div>
-
-<script src="{{ url_for('static', filename='theme.js') }}" defer></script>
-</body>
-</html>
+{% endblock %}
